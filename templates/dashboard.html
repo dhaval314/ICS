@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ICS Protection Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<script>
+    function updateAlerts() {
+        fetch('/alerts/live')
+            .then(response => response.json())
+            .then(alerts => {
+                const alertsDiv = document.querySelector('.alerts');
+                alertsDiv.innerHTML = '';  // Clear previous alerts
+                alerts.forEach(alert => {
+                    const span = document.createElement('span');
+                    span.className = 'alert';
+                    span.textContent = alert;
+                    alertsDiv.appendChild(span);
+                });
+            });
+    }
+
+    setInterval(updateAlerts, 3000);  // Poll every 3 seconds
+    window.onload = updateAlerts;
+</script>
+
+<body>
+    <div class="sidebar">
+        <h2>ICS Guard</h2>
+        <ul>
+            <li>Dashboard</li>
+            <li>Device Map</li>
+            <li><a href="/logs" style="color: white; text-decoration: none;">Logs</a></li>
+            <li>Settings</li>
+        </ul>
+    </div>
+
+    <div class="main">
+        <div class="navbar">
+            <h1>Network Monitoring</h1>
+            <div class="alerts">
+                {% for alert in data.alerts %}
+                <span class="alert">{{ alert }}</span>
+                {% endfor %}
+            </div>
+
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="mb-3">
+                {% for category, msg in messages %}
+                <div class="alert alert-{{ category }}">{{ msg }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% endwith %}
+
+        {% if data.last_scan_time %}
+            <p><strong>Last Scan:</strong> {{ data.last_scan_time }}</p>
+        {% endif %}
+
+        <div class="cards">
+            <div class="card">
+                <h3>Some Network Statistics</h3>
+                <p id="net-traffic">Calculating...</p>
+            </div>
+        </div>
+
+
+        <div class="controls">
+            <form method="POST" action="/">
+                <!-- Subnet for Scan -->
+                <input type="text" name="subnet" placeholder="192.168.1.1/24"
+                    style="padding: 8px; border-radius: 4px; border: 1px solid #ccc; margin-right: 10px;">
+
+                <button type="submit" name="action" value="scan">Scan Network</button>
+            </form>
+        </div>
+
+
+        <div class="log-table">
+            <h2>Discovered Devices</h2>
+            <table>
+                <thead>
+                    <tr><th>IP Address</th><th>MAC Address</th></tr>
+                </thead>
+                <tbody>
+                    {% for device in data.scan_results %}
+                    <tr>
+                        <td>{{ device.ip }}</td>
+                        <td>{{ device.mac }}</td>
+                        <td>
+                            <form method="POST" action="/modify_rule" style="display: inline;">
+                                <input type="hidden" name="target_ip" value="{{ device.ip }}">
+                                <input type="hidden" name="router_ip" value="192.168.1.1">
+                                <button type="submit" name="action" value="block" class="action-button block">Block</button>
+                                <button type="submit" name="action" value="isolate" class="action-button isolate">Isolate</button>
+                                <button type="submit" name="action" value="unblock" class="action-button unblock">Unblock</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="3">No scan results yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+            <h2>Start Phishing Detection</h2>
+
+            {% if data.active_detection %}
+                <p style="color: red;"><strong>Detection active for {{ data.active_detection }}</strong></p>
+                <form method="POST" action="/stop_detection">
+                    <button type="submit" class="detection-button stop-detection">Stop Detection</button>
+                </form>
+            {% else %}
+                <form method="POST" action="/start_detection">
+                    <label for="victim_ip">Select a device:</label>
+                    <select name="victim_ip" required>
+                        {% for device in data.scan_results %}
+                        <option value="{{ device.ip }}">{{ device.ip }} - {{ device.mac }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="hidden" name="router_ip" value="192.168.1.1">
+                    <button type="submit" class="detection-button start-detection">Start Detection</button>
+                </form>
+            {% endif %}
+
+
+
+
+
+
+        </div>
+    </div>
+</body>
+
+</html>

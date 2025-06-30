@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Alert Logs - ICS Guard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="sidebar">
+        <h2>ICS Guard</h2>
+        <ul>
+            <li><a href="/" style="color: white; text-decoration: none;">Dashboard</a></li>
+            <li>Device Map</li>
+            <li><a href="/logs" style="color: white; text-decoration: none;">Logs</a></li>
+            <li>Settings</li>
+        </ul>
+    </div>
+
+    <div class="main">
+        <div class="navbar">
+            <h1>Alert Logs</h1>
+        </div>
+
+        <div class="log-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Event</th>
+                        <th>Severity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr>
+                        <td>{{ log[0] }}</td>
+                        <td>{{ log[1] }}</td>
+                        <td class="{{ log[2]|lower }}">{{ log[2] }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="3">No alerts logged yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

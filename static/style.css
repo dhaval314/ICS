@@ -1,0 +1,149 @@
+/* style.css */
+
+body {
+    margin: 0;
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    height: 100vh;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f4f6f9;
+    color: #333;
+}
+
+.sidebar {
+    background: #2e3b4e;
+    color: white;
+    padding: 20px;
+}
+
+.main {
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.sidebar h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar li {
+    padding: 10px 0;
+    cursor: pointer;
+}
+
+.main {
+    flex: 1;
+    padding: 20px;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.alerts {
+    display: flex;
+    gap: 10px;
+}
+
+.alert {
+    background: #d9534f;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.9em;
+}
+
+.cards {
+    display: flex;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    flex: 1;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.controls {
+    margin-bottom: 20px;
+}
+
+.controls button {
+    margin-right: 10px;
+    padding: 10px 15px;
+    background: #2e3b4e;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.log-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.log-table th, .log-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+.log-table th {
+    background: #2e3b4e;
+    color: white;
+}
+
+.high {
+    color: #d9534f;
+    font-weight: bold;
+}
+
+.medium {
+    color: #f0ad4e;
+    font-weight: bold;
+}
+
+.low {
+    color: #5cb85c;
+    font-weight: bold;
+}
+
+/* Detection Button Styles */
+.detection-button {
+    padding: 10px 15px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+/* Start Detection = same as sidebar/nav dark */
+.start-detection {
+    background-color: #2e3b4e;
+    color: white;
+}
+
+.start-detection:hover {
+    background-color: #1f2a3a;
+}
+
+/* Stop Detection = same as alert red */
+.stop-detection {
+    background-color: #d9534f;
+    color: white;
+}
+
+.stop-detection:hover {
+    background-color: #c9302c;
+}

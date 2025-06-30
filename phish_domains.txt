@@ -1,0 +1,2 @@
+dns.google.com
+bing.com
