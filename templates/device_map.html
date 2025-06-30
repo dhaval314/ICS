@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Device Map</title>
+    <script type="text/javascript" src="https://unpkg.com/vis-network@9.1.2/dist/vis-network.min.js"></script>
+    <link href="https://unpkg.com/vis-network@9.1.2/styles/vis-network.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        #network {
+            width: 100%;
+            height: 90vh;
+            border: 1px solid lightgray;
+        }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>ICS Guard</h2>
+        <ul>
+            <li><a href="/" style="color: white; text-decoration: none;">Dashboard</a></li>
+            <li><a href="/device_map" style="color: white; text-decoration: none;">Device Map</a></li>
+            <li><a href="/logs" style="color: white; text-decoration: none;">Logs</a></li>
+            <li><a href="/logs" style="color: white; text-decoration: none;">Settings</a></li>
+        </ul>
+    </div>
+    
+    <div class="main">
+    <h2 style="padding: 20px;">ICS Device Map</h2>
+    <div id="network"></div>
+
+   <script>
+    const deviceList = {{ devices|tojson }};
+    const routerIP = "192.168.1.1";
+
+    const nodes = [
+        { id: 1, label: "Router\n" + routerIP, color: "#2e3b4e", font: { color: "black" } }
+    ];
+    const edges = [];
+
+    let nodeId = 2;
+    const ipToId = {};
+
+    deviceList.forEach(device => {
+        if (device.ip === routerIP) return;  // Skip adding router as a child node
+
+        const label = device.ip + "\n" + device.mac;
+        ipToId[device.ip] = nodeId;
+
+        nodes.push({
+            id: nodeId,
+            label: label,
+            color: "#5cb85c"
+        });
+
+        edges.push({ from: 1, to: nodeId });  // Link device to router
+        nodeId++;
+    });
+
+    const data = {
+        nodes: new vis.DataSet(nodes),
+        edges: new vis.DataSet(edges)
+    };
+
+    const options = {
+        nodes: { shape: "dot", size: 20 },
+        edges: { arrows: "to" },
+        layout: { improvedLayout: true },
+        physics: { stabilization: true }
+    };
+
+    const container = document.getElementById("network");
+    new vis.Network(container, data, options);
+</script>
+
+</div>
+</body>
+</html>

@@ -57,6 +57,12 @@ def init_db():
             severity TEXT
         )
     ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS trusted_devices (
+            ip TEXT PRIMARY KEY,
+            mac TEXT
+        )
+    ''')
     conn.commit()
     conn.close()
 
@@ -75,6 +81,12 @@ def get_all_alerts():
     rows = cursor.fetchall()
     conn.close()
     return [{"time": row[0], "event": row[1], "severity": row[2]} for row in rows]
+
+@app.route("/device_map")
+def device_map():
+    init_db()
+    return render_template("device_map.html", devices=scan_results)
+
 
 @app.route('/start_detection', methods=['POST'])
 def start_detection():
@@ -112,11 +124,46 @@ def stop_detection():
 
     return redirect(url_for('dashboard'))
 
+def get_trusted_ips():
+    conn = sqlite3.connect("phishguard.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT ip FROM trusted_devices")
+    rows = cursor.fetchall()
+    conn.close()
+    return {ip for (ip,) in rows}
+
+
+def toggle_trust(ip, trusted):
+    conn = sqlite3.connect("phishguard.db")
+    cursor = conn.cursor()
+    if trusted:
+        cursor.execute("INSERT OR IGNORE INTO trusted_devices (ip) VALUES (?)", (ip,))
+    else:
+        cursor.execute("DELETE FROM trusted_devices WHERE ip = ?", (ip,))
+    conn.commit()
+    conn.close()
+
+
+
+@app.route('/trust_toggle', methods=['POST'])
+def trust_toggle():
+    ip = request.form['ip']
+    trusted = request.form.get('trusted') == 'on'
+    toggle_trust(ip, trusted)
+    flash(f"{'Trusted' if trusted else 'Untrusted'} device: {ip}", "info")
+    return redirect(url_for('dashboard'))
+
+
 
 @app.route('/', methods=['GET', 'POST'])
 def dashboard():
     init_db()
     global scan_results, last_scan_time
+    
+    trusted_ips = get_trusted_ips()
+    for device in scan_results:
+        device['trusted'] = device['ip'] in trusted_ips
+
 
     if request.method == 'POST':
         action = request.form.get('action')
@@ -255,6 +302,9 @@ def start_arp_sniffer(target_ip, gateway_ip):
         spoof(gateway_ip, target_ip)
         sniff(filter="udp port 53", prn=monitor_dns, store=0, count=1)
         time.sleep(2)
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -29,10 +29,10 @@
     <div class="sidebar">
         <h2>ICS Guard</h2>
         <ul>
-            <li>Dashboard</li>
-            <li>Device Map</li>
+            <li><a href="/" style="color: white; text-decoration: none;">Dashboard</a></li>
+            <li><a href="/device_map" style="color: white; text-decoration: none;">Device Map</a></li>
             <li><a href="/logs" style="color: white; text-decoration: none;">Logs</a></li>
-            <li>Settings</li>
+            <li><a href="/logs" style="color: white; text-decoration: none;">Settings</a></li>
         </ul>
     </div>
 
@@ -84,13 +84,24 @@
             <h2>Discovered Devices</h2>
             <table>
                 <thead>
-                    <tr><th>IP Address</th><th>MAC Address</th></tr>
+                    <tr>
+                        <th>IP Address</th>
+                        <th>MAC Address</th>
+                        <th>Trust</th>
+                        <th>Actions</th>
+                    </tr>
                 </thead>
                 <tbody>
                     {% for device in data.scan_results %}
                     <tr>
                         <td>{{ device.ip }}</td>
                         <td>{{ device.mac }}</td>
+                        <td>
+                            <form method="POST" action="/trust_toggle">
+                                <input type="hidden" name="ip" value="{{ device.ip }}">
+                                <input type="checkbox" name="trusted" onchange="this.form.submit()" {% if device.trusted %}checked{% endif %}>
+                            </form>
+                        </td>
                         <td>
                             <form method="POST" action="/modify_rule" style="display: inline;">
                                 <input type="hidden" name="target_ip" value="{{ device.ip }}">
@@ -101,12 +112,11 @@
                             </form>
                         </td>
                     </tr>
-                    {% else %}
-                    <tr><td colspan="3">No scan results yet.</td></tr>
                     {% endfor %}
                 </tbody>
-
             </table>
+
+
             <h2>Start Phishing Detection</h2>
 
             {% if data.active_detection %}
