@@ -4,34 +4,34 @@
 
 ## Features
 
-### ✅ Network Scanning
+###  Network Scanning
 - Scans a specified subnet for connected devices.
 - Displays IP and MAC address of discovered devices.
 - Identifies devices with MAC randomization (e.g., iPhones).
 
-### ✅ Real-time Phishing Detection
+### Real-time Phishing Detection
 - Uses ARP spoofing to redirect victim DNS queries.
 - Sniffs DNS packets for suspicious/phishing domains.
 - Automatically logs alerts to SQLite database.
 - Supports severity levels (High/Medium/Low) via `phish_domains.txt`.
 
-### ✅ Network Control Tools
+### Network Control Tools
 - **Block IP**: Blocks all internet access to a device.
 - **Isolate Node**: Blocks all LAN communication except with the admin (you).
 - **Unblock** / **Unisolate**: Restores original access.
 - ARP spoofing is used to enforce rules without requiring remote access.
 
-### ✅ Device Trust Control
+### Device Trust Control
 - Each scanned device has a “Trusted” checkbox.
 - Trusted devices are saved in the database.
 - Alerts or decisions can factor in trust status.
 
-### ✅ Real-Time Dashboard
+### Real-Time Dashboard
 - Live alert updates every few seconds.
 - Device map visualizes topology (router → devices).
 - Clean, styled UI with actionable buttons for each device.
 
-### ✅ Process Control
+### Process Control
 - Start and Stop phishing detection for any victim with one click.
 - Automatically manages IP forwarding, ARP restoration, and sniffing cleanup.
 
